@@ -22,7 +22,7 @@ def train(args, model, device, train_loader, optimizer, epoch, start_time):
                 
                 
 # This function evaluates the model on the test data
-def test(args, model, device, test_loader, epoch):
+def test(args, model, device, test_loader, epoch, trainDataset, testDataset):
     model.eval()
     test_loss = 0
     correct = 0
