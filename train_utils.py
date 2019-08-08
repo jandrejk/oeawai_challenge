@@ -50,7 +50,7 @@ def test(args, model, device, test_loader, epoch, trainDataset, testDataset, pat
 
     with open(path_save + 'NN-submission-' +str(epoch)+'.csv', 'w', newline='') as writeFile:
         fieldnames = ['Id', 'Predicted']
-        writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=', ',
+        writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=',',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
         writer.writeheader()
         for index in range(len(testDataset)):
