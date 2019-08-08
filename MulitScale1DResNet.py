@@ -1,6 +1,7 @@
 import torch.nn as nn
 import math
 import torch.utils.model_zoo as model_zoo
+import torch.nn.functional as F
 
 import torch
 
@@ -160,7 +161,7 @@ class MSResNet(nn.Module):
         self.maxpool7 = nn.AvgPool1d(kernel_size=6, stride=1, padding=0)
 
         # self.drop = nn.Dropout(p=0.2)
-        self.fc = nn.Linear(256*3, num_classes)
+        self.fc = nn.Linear(4096*3, num_classes)
 
         # todo: modify the initialization
         # for m in self.modules():
@@ -233,19 +234,25 @@ class MSResNet(nn.Module):
         x0 = self.maxpool(x0)
 
         x = self.layer3x3_1(x0)
+        x = self.maxpool(x)
         x = self.layer3x3_2(x)
+        x = self.maxpool(x)
         x = self.layer3x3_3(x)
         # x = self.layer3x3_4(x)
         x = self.maxpool3(x)
 
         y = self.layer5x5_1(x0)
+        y = self.maxpool(y)
         y = self.layer5x5_2(y)
+        y = self.maxpool(y)
         y = self.layer5x5_3(y)
         # y = self.layer5x5_4(y)
         y = self.maxpool5(y)
 
         z = self.layer7x7_1(x0)
+        z = self.maxpool(z)
         z = self.layer7x7_2(z)
+        z = self.maxpool(z)
         z = self.layer7x7_3(z)
         # z = self.layer7x7_4(z)
         z = self.maxpool7(z)
@@ -256,7 +263,7 @@ class MSResNet(nn.Module):
         # out = self.drop(out)
         out1 = self.fc(out)
 
-        return out1
+        return F.log_softmax(out1, dim=1)
 
 
 
