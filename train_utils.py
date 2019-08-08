@@ -36,7 +36,7 @@ def train(args, model, device, train_loader, optimizer, epoch, start_time):
                 
                 
 # This function evaluates the model on the test data
-def test(args, model, device, test_loader, epoch, trainDataset, testDataset, path_save):
+def test(args, model, device, test_loader, epoch, trainDataset, testDataset, path_submission):
     model.eval()
     test_loss = 0
     correct = 0
@@ -48,11 +48,34 @@ def test(args, model, device, test_loader, epoch, trainDataset, testDataset, pat
     
     familyPredictionStrings = trainDataset.transformInstrumentsFamilyToString(familyPredictions.astype(int))
 
-    with open(path_save + 'NN-submission-' +str(epoch)+'.csv', 'w', newline='') as writeFile:
-        fieldnames = ['Id', 'Predicted']
+    with open(path_submission + 'NN-submission-' +str(epoch)+'.csv', 'w', newline='') as writeFile:
+        fieldnames = ['Id', 'Expected']
         writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=',',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
         writer.writeheader()
         for index in range(len(testDataset)):
-            writer.writerow({'Id': index, 'Predicted': familyPredictionStrings[index]})
+            writer.writerow({'Id': index, 'Expected': familyPredictionStrings[index]})
     print('saved predictions')
+    
+    
+# This function evaluates the model on the test data
+"""
+def test(args, model, device, test_loader, epoch, trainDataset, testDataset, path_save):
+
+    model.eval()
+
+    write_out = list[np.zeros(len(testDataset))]
+    
+    with open(path_save + 'NN-submission-' +str(epoch)+'.csv', 'w', newline='') as writeFile:
+        for samples, indexes in test_loader:
+            for sample, index in samples, indexes:
+                write_out[index] = trainDataset.transformInstrumentsFamilyToString(model(samples[0]).max(1)[1].cpu().astype(int))
+        
+        fieldnames = ['Id', 'Predicted']
+        writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=',',
+                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        writer.writeheader()
+        for i in range(len(familyPredictions)):
+            writer.writerow({'Id': i, 'Predicted': write_out[i]})
+    print('saved predictions')
+"""

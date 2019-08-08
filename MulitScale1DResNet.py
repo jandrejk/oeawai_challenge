@@ -223,6 +223,9 @@ class MSResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x0):
+        
+        x0 = x0.view(1,-1)
+        
         x0 = self.conv1(x0)
         x0 = self.bn1(x0)
         x0 = self.relu(x0)
@@ -252,7 +255,7 @@ class MSResNet(nn.Module):
         # out = self.drop(out)
         out1 = self.fc(out)
 
-        return out1, out
+        return out1
 
 
 
