@@ -32,7 +32,7 @@ def train(args, model, device, train_loader, optimizer, epoch, start_time):
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tF1: {:.4f}\tRuntime: {:.1f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item(), f1_score(target, output_to_class(output), average='micro'), time.time() - start_time))
+                100. * batch_idx / len(train_loader), loss.item(), f1_score(target.detach().cpu().numpy(), output_to_class(output), average='micro'), time.time() - start_time))
                 
                 
 # This function evaluates the model on the test data
