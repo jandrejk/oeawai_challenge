@@ -49,10 +49,10 @@ def test(args, model, device, test_loader, epoch, trainDataset, testDataset, pat
     familyPredictionStrings = trainDataset.transformInstrumentsFamilyToString(familyPredictions.astype(int))
 
     with open(path_save + 'NN-submission-' +str(epoch)+'.csv', 'w', newline='') as writeFile:
-        fieldnames = ['Id', 'Expected']
-        writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=',',
+        fieldnames = ['Id', 'Predicted']
+        writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=', ',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
         writer.writeheader()
         for index in range(len(testDataset)):
-            writer.writerow({'Id': index, 'Expected': familyPredictionStrings[index]})
+            writer.writerow({'Id': index, 'Predicted': familyPredictionStrings[index]})
     print('saved predictions')
