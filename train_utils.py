@@ -53,17 +53,12 @@ def test(args, model, device, test_loader, epoch, trainDataset, testDataset, pat
             prediction_batch = output_to_class(out)
             
             for pred, index in zip(prediction_batch,indices):
-                instruments[int(index)] = pred
-        
-        #check if all instruments are predicted
-        for i,value in enumerate(instruments):
-            if value > 9:
-                print(i)
+                instruments[int(index)] = trainDataset.transformInstrumentsFamilyToString([pred])
     
         fieldnames = ['Id', 'Predicted']
         writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=',',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
         writer.writeheader()
         for i in range(len(instruments)):
-            writer.writerow({'Id': i, 'Predicted': instruments[i]})
+            writer.writerow({'Id': i, 'Predicted': instruments[i][0]})
     print('saved predictions')

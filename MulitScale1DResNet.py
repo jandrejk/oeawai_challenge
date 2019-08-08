@@ -123,7 +123,8 @@ class BasicBlock7x7(nn.Module):
 
 
 class MSResNet(nn.Module):
-    def __init__(self, input_channel, layers=[1, 1, 1, 1], num_classes=10):
+    def __init__(self, input_channel, device, layers=[1, 1, 1, 1], num_classes=10):
+        self.device = device
         self.inplanes3 = 64
         self.inplanes5 = 64
         self.inplanes7 = 64
@@ -224,7 +225,7 @@ class MSResNet(nn.Module):
 
     def forward(self, x0):
         
-        x0 = x0.view(1,-1)
+        x0 = x0.view(x0.size()[0],1,-1).to(self.device).float()
         
         x0 = self.conv1(x0)
         x0 = self.bn1(x0)
