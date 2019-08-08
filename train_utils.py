@@ -33,49 +33,37 @@ def train(args, model, device, train_loader, optimizer, epoch, start_time):
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tF1: {:.4f}\tRuntime: {:.1f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item(), f1_score(target.detach().cpu().numpy(), output_to_class(output), average='micro'), time.time() - start_time))
-                
-                
-# This function evaluates the model on the test data
-def test(args, model, device, test_loader, epoch, trainDataset, testDataset, path_submission):
-    model.eval()
-    test_loss = 0
-    correct = 0
-    with torch.no_grad():
-        familyPredictions = np.zeros(len(test_loader.dataset), dtype=np.int)
-        for index, samples in enumerate(test_loader):
-            samples = samples.to(device)
-            familyPredictions[index*len(samples):(index+1)*len(samples)] = model(samples).max(1)[1].cpu() # get the index of the max log-probability
+                    
     
-    familyPredictionStrings = trainDataset.transformInstrumentsFamilyToString(familyPredictions.astype(int))
+# This function evaluates the model on the test data
 
-    with open(path_submission + 'NN-submission-' +str(epoch)+'.csv', 'w', newline='') as writeFile:
-        fieldnames = ['Id', 'Expected']
-        writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=',',
-                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        writer.writeheader()
-        for index in range(len(testDataset)):
-            writer.writerow({'Id': index, 'Expected': familyPredictionStrings[index]})
-    print('saved predictions')
-    
-    
-# This function evaluates the model on the test data
-"""
 def test(args, model, device, test_loader, epoch, trainDataset, testDataset, path_save):
 
     model.eval()
 
-    write_out = list[np.zeros(len(testDataset))]
+    instruments = list(np.zeros(len(testDataset)))
     
     with open(path_save + 'NN-submission-' +str(epoch)+'.csv', 'w', newline='') as writeFile:
-        for samples, indexes in test_loader:
-            for sample, index in samples, indexes:
-                write_out[index] = trainDataset.transformInstrumentsFamilyToString(model(samples[0]).max(1)[1].cpu().astype(int))
         
+        instruments = list(15*np.ones(len(testDataset)))
+        
+        for samples, indices in test_loader:
+            
+            out = model(samples)
+            prediction_batch = output_to_class(out)
+            
+            for pred, index in zip(prediction_batch,indices):
+                instruments[int(index)] = pred
+        
+        #check if all instruments are predicted
+        for i,value in enumerate(instruments):
+            if value > 9:
+                print(i)
+    
         fieldnames = ['Id', 'Predicted']
         writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=',',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
         writer.writeheader()
-        for i in range(len(familyPredictions)):
-            writer.writerow({'Id': i, 'Predicted': write_out[i]})
+        for i in range(len(instruments)):
+            writer.writerow({'Id': i, 'Predicted': instruments[i]})
     print('saved predictions')
-"""
