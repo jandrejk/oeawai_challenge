@@ -12,7 +12,7 @@ def logMagStft(numpyArray, sample_rate, n_fft):
 
 def ffts(ts):
     """
-    calculates the absolut value of the fourier transform
+    calculates the imaginary value of the fourier transform and saves it as pair of reals
     """
     cffarr=np.fft.rfft(ts)
     rffarr= np.empty(len(ts))
