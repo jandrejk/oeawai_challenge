@@ -40,8 +40,6 @@ def train(args, model, device, train_loader, optimizer, epoch, start_time):
 def test(args, model, device, test_loader, epoch, trainDataset, testDataset, path_save):
 
     model.eval()
-
-    instruments = list(np.zeros(len(testDataset)))
     
     with open(path_save + 'NN-submission-' +str(epoch)+'.csv', 'w', newline='') as writeFile:
         
@@ -62,3 +60,65 @@ def test(args, model, device, test_loader, epoch, trainDataset, testDataset, pat
         for i in range(len(instruments)):
             writer.writerow({'Id': i, 'Predicted': instruments[i][0]})
     print('saved predictions')
+
+
+def save_output(args, model, device, test_loader, which_net, trainDataset, testDataset, path_save):
+
+    model.eval()
+    
+    with open(path_save + 'output-' +which_net+'.csv', 'w', newline='') as writeFile:
+        
+        outputs = np.ones(len(testDataset), 10)
+        
+        for samples, indices in test_loader:
+            
+            out = model(samples)
+            
+            for pred, index in zip(out,indices):
+                outputs[int(index)] = pred.detach().cpu().numpy()
+    
+        writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=',',
+                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        writer.writeheader()
+        for i in range(len(instruments)):
+            writer.writerow({list(outputs[i])})
+    print('saved outputs')
+ 
+
+def save_geometric_mean_predictions(path_1D, path_2D, path_save, trainDataset, testDataset):
+
+    model.eval()
+    
+    # get outs
+    out_1D = []
+    out_2D = []
+    instruments = []
+    
+    with open(path_1D), 'r') as readFile:
+        reader = csv.reader(readFile)
+        out_1D.append(list(reader))
+    readFile.close()
+    
+    with open(path_2D), 'r') as readFile:
+        reader = csv.reader(readFile)
+        out_2D.append(list(reader))
+    readFile.close()
+    
+    # geometric mean
+    for pred1, pred2 in zip(out_1D, out_2D):
+        pred = np.sqrt(pred1*pred2)
+        pred = output_to_class(pred)
+        pred = trainDataset.transformInstrumentsFamilyToString([pred])
+        instruments.append(pred)
+    
+    # write submission file
+    with open(path_save + 'NN-submission-combined-model.csv', 'w', newline='') as writeFile:
+        
+        fieldnames = ['Id', 'Predicted']
+        writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=',',
+                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        writer.writeheader()
+        for i in range(len(instruments)):
+            writer.writerow({'Id': i, 'Predicted': instruments[i][0]})
+    print('saved predictions')
+    
