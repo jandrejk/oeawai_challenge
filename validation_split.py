@@ -3,19 +3,22 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import numpy as np
 
 
-def get_dataloaders(dataset, batch_size = 8, validation_split = .2, shuffle_dataset = True, random_seed= 42):
+def get_dataloaders(dataset, batch_size = 8, validation_split = .2, shuffle_dataset = True, random_seed= 42, indices = None):
     """
     Returns the dataloader objects train_loader and validation_loader. If choosen, shuffels the dataset. Splits the dataset.
     """
 
     # Creating data indices for training and validation splits:
-    dataset_size = len(dataset)
-    indices = list(range(dataset_size))
-    split = int(np.floor(validation_split * dataset_size)) #floor rounds down
-    if shuffle_dataset :
-        np.random.seed(random_seed)
-        np.random.shuffle(indices)
-    train_indices, val_indices = indices[split:], indices[:split]
+    if indices == None:
+        dataset_size = len(dataset)
+        indices = list(range(dataset_size))
+        split = int(np.floor(validation_split * dataset_size)) #floor rounds down
+        if shuffle_dataset :
+            np.random.seed(random_seed)
+            np.random.shuffle(indices)
+        train_indices, val_indices = indices[split:], indices[:split]
+    else: 
+        train_indices, val_indices = indices[0], indices[1]
 
     # Creating PT data samplers and loaders:
     train_sampler = SubsetRandomSampler(train_indices)
@@ -28,4 +31,4 @@ def get_dataloaders(dataset, batch_size = 8, validation_split = .2, shuffle_data
                                    batch_size=batch_size,
                                    sampler=valid_sampler)
     
-    return train_loader, validation_loader
+    return train_loader, validation_loader, [train_indices, val_indices]

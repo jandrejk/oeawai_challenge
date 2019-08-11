@@ -94,12 +94,12 @@ def save_geometric_mean_predictions(path_1D, path_2D, path_save, trainDataset, t
     out_2D = []
     instruments = []
     
-    with open(path_1D), 'r') as readFile:
+    with open(path_1D, 'r') as readFile:
         reader = csv.reader(readFile)
         out_1D.append(list(reader))
     readFile.close()
     
-    with open(path_2D), 'r') as readFile:
+    with open(path_2D, 'r') as readFile:
         reader = csv.reader(readFile)
         out_2D.append(list(reader))
     readFile.close()
