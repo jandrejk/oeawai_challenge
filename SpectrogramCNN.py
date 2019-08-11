@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-from math_utils import logMagStft, ffts
+from math_utils import logMagStft
 
 
 # NN architecture (three conv and two fully connected layers)
