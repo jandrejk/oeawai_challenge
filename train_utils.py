@@ -68,7 +68,7 @@ def save_output(args, model, device, test_loader, which_net, trainDataset, testD
     
     with open(path_save + 'output-' +which_net+'.csv', 'w', newline='') as writeFile:
         
-        outputs = np.ones(len(testDataset), 10)
+        outputs = np.ones([len(testDataset), 10])
         
         for samples, indices in test_loader:
             
