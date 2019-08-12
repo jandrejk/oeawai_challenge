@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import time
 import csv
 from sklearn.metrics import f1_score
+import pickle
 
 
 def output_to_class(output):
@@ -66,7 +67,7 @@ def save_output(args, model, device, test_loader, which_net, trainDataset, testD
 
     model.eval()
     
-    with open(path_save + 'output-' +which_net+'.csv', 'w', newline='') as writeFile:
+    with open(path_save + 'output-' +which_net+'.txt', 'wb') as writeFile:
         
         outputs = np.ones([len(testDataset), 10])
         
@@ -76,12 +77,9 @@ def save_output(args, model, device, test_loader, which_net, trainDataset, testD
             
             for pred, index in zip(out,indices):
                 outputs[int(index)] = pred.detach().cpu().numpy()
+
+        pickle.dump([outputs], writeFile)
     
-        writer = csv.DictWriter(writeFile, fieldnames=fieldnames, delimiter=',',
-                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        writer.writeheader()
-        for i in range(len(instruments)):
-            writer.writerow({list(outputs[i])})
     print('saved outputs')
  
 
@@ -90,19 +88,13 @@ def save_geometric_mean_predictions(path_1D, path_2D, path_save, trainDataset, t
     model.eval()
     
     # get outs
-    out_1D = []
-    out_2D = []
     instruments = []
     
-    with open(path_1D, 'r') as readFile:
-        reader = csv.reader(readFile)
-        out_1D.append(list(reader))
-    readFile.close()
+    with open(path_1D, 'rb') as readFile:
+        out_1D = pickle.load(readFile)
     
-    with open(path_2D, 'r') as readFile:
-        reader = csv.reader(readFile)
-        out_2D.append(list(reader))
-    readFile.close()
+    with open(path_2D, 'rb') as readFile:
+        out_2D = pickle.load(readFile)
     
     # geometric mean
     for pred1, pred2 in zip(out_1D, out_2D):
