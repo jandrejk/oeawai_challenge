@@ -84,23 +84,24 @@ def save_output(args, model, device, test_loader, which_net, trainDataset, testD
  
 
 def save_geometric_mean_predictions(path_1D, path_2D, path_save, trainDataset, testDataset):
-
-    model.eval()
     
     # get outs
     instruments = []
     
     with open(path_1D, 'rb') as readFile:
-        out_1D = pickle.load(readFile)
+        out_1D = pickle.load(readFile)[0]
     
     with open(path_2D, 'rb') as readFile:
-        out_2D = pickle.load(readFile)
+        out_2D = pickle.load(readFile)[0]
     
     # geometric mean
     for pred1, pred2 in zip(out_1D, out_2D):
-        pred = np.sqrt(pred1*pred2)
-        pred = output_to_class(pred)
-        pred = trainDataset.transformInstrumentsFamilyToString([pred])
+        #print('out1D: ', out_1D)
+        #print('out2D: ', out_2D)
+        pred = np.log(np.sqrt(np.exp(pred1)*np.exp(pred2)))
+        #print('pred: ', pred)
+        pred = output_to_class([pred])
+        pred = trainDataset.transformInstrumentsFamilyToString(pred)
         instruments.append(pred)
     
     # write submission file
@@ -113,4 +114,3 @@ def save_geometric_mean_predictions(path_1D, path_2D, path_save, trainDataset, t
         for i in range(len(instruments)):
             writer.writerow({'Id': i, 'Predicted': instruments[i][0]})
     print('saved predictions')
-    

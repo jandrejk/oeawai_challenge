@@ -80,28 +80,32 @@ class CNN2D(nn.Module):
           nn.Conv2d(1, 32, (4,10), 1),
           nn.BatchNorm2d(32),
           nn.ReLU(),
-          nn.MaxPool2d((2,2))
+          nn.MaxPool2d((2,2)),
+          nn.Dropout(p=0.1)
         )
         
         self.conv_2 = nn.Sequential(
           nn.Conv2d(32, 32, (4,10), 1),
           nn.BatchNorm2d(32),
           nn.ReLU(),
-          nn.MaxPool2d((2,2))
+          nn.MaxPool2d((2,2)),
+          nn.Dropout(p=0.1)
         )
         
         self.conv_3 = nn.Sequential(
           nn.Conv2d(32, 32, (4,10), 1),
           nn.BatchNorm2d(32),
           nn.ReLU(),
-          nn.MaxPool2d((2,2))
+          nn.MaxPool2d((2,2)),
+          nn.Dropout(p=0.1)
         )
         
         self.conv_4 = nn.Sequential(
           nn.Conv2d(32, 32, (4,10), 1),
           nn.BatchNorm2d(32),
           nn.ReLU(),
-          nn.MaxPool2d((2,2))
+          nn.MaxPool2d((2,2)),
+          nn.Dropout(p=0.1)
         )
 
         self.fc1 = nn.Linear(32*13*7, 64)
