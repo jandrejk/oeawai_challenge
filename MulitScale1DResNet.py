@@ -136,32 +136,32 @@ class MSResNet(nn.Module):
                                bias=False)
         self.bn1 = nn.BatchNorm1d(64)
         self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool1d(kernel_size=3, stride=2, padding=1)
+        self.maxpool = nn.AvgPool1d(kernel_size=3)#, stride=2, padding=1)
 
         self.layer3x3_1 = self._make_layer3(BasicBlock3x3, 32, layers[0], stride=2)
         self.layer3x3_2 = self._make_layer3(BasicBlock3x3, 64, layers[1], stride=2)
         self.layer3x3_3 = self._make_layer3(BasicBlock3x3, 128, layers[2], stride=2)
         self.layer3x3_4 = self._make_layer3(BasicBlock3x3, 256, layers[3], stride=2)
 
-        # maxplooing kernel size: 16, 11, 6
-        self.maxpool3 = nn.AvgPool1d(kernel_size=16, stride=1, padding=0)
+        #maxplooing kernel size: 16, 11, 6
+        self.maxpool3 = nn.AvgPool1d(kernel_size=25, stride=1, padding=0)
 
 
         self.layer5x5_1 = self._make_layer5(BasicBlock5x5, 32, layers[0], stride=2)
         self.layer5x5_2 = self._make_layer5(BasicBlock5x5, 64, layers[1], stride=2)
         self.layer5x5_3 = self._make_layer5(BasicBlock5x5, 128, layers[2], stride=2)
         self.layer5x5_4 = self._make_layer5(BasicBlock5x5, 256, layers[3], stride=2)
-        self.maxpool5 = nn.AvgPool1d(kernel_size=11, stride=1, padding=0)
+        self.maxpool5 = nn.AvgPool1d(kernel_size=21, stride=1, padding=0)
 
 
         self.layer7x7_1 = self._make_layer7(BasicBlock7x7, 32, layers[0], stride=2)
         self.layer7x7_2 = self._make_layer7(BasicBlock7x7, 64, layers[1], stride=2)
         self.layer7x7_3 = self._make_layer7(BasicBlock7x7, 128, layers[2], stride=2)
         self.layer7x7_4 = self._make_layer7(BasicBlock7x7, 256, layers[3], stride=2)
-        self.maxpool7 = nn.AvgPool1d(kernel_size=6, stride=1, padding=0)
+        self.maxpool7 = nn.AvgPool1d(kernel_size=18, stride=1, padding=0)
 
         # self.drop = nn.Dropout(p=0.2)
-        self.fc = nn.Linear(85760, num_classes)
+        self.fc = nn.Linear(3*256, num_classes)
 
         # todo: modify the initialization
         # for m in self.modules():
@@ -232,6 +232,7 @@ class MSResNet(nn.Module):
         x0 = self.bn1(x0)
         x0 = self.relu(x0)
         x0 = self.maxpool(x0)
+        #print(x0.size())
 
         x = self.layer3x3_1(x0)
         x = self.maxpool(x)
@@ -240,6 +241,7 @@ class MSResNet(nn.Module):
         x = self.layer3x3_3(x)
         x = self.maxpool(x)
         x = self.layer3x3_4(x)
+        #print(x.size())
         x = self.maxpool3(x)
 
         y = self.layer5x5_1(x0)
@@ -249,6 +251,7 @@ class MSResNet(nn.Module):
         y = self.layer5x5_3(y)
         y = self.maxpool(y)
         y = self.layer5x5_4(y)
+        #print(y.size())
         y = self.maxpool5(y)
 
         z = self.layer7x7_1(x0)
@@ -258,6 +261,7 @@ class MSResNet(nn.Module):
         z = self.layer7x7_3(z)
         z = self.maxpool(z)
         z = self.layer7x7_4(z)
+        #print(z.size())
         z = self.maxpool7(z)
         
         out = torch.cat([x.view(x.size()[0], -1), y.view(y.size()[0], -1), z.view(z.size()[0], -1)], dim=1)
